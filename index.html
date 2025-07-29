@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trading Profit & Pips Calculator</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            backdrop-filter: blur(10px);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 2.2em;
+            font-weight: 700;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #7f8c8d;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+        
+        .formula-box {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 10px;
+            margin: 25px 0;
+            text-align: center;
+            font-size: 1.2em;
+            font-weight: 600;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        
+        .interactive-calc {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            padding: 25px;
+            border-radius: 10px;
+            margin: 25px 0;
+        }
+        
+        .calc-title {
+            text-align: center;
+            font-size: 1.5em;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+        
+        .input-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .input-group {
+            margin: 15px 0;
+        }
+        
+        .full-width {
+            grid-column: 1 / -1;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1.1em;
+            transition: all 0.3s ease;
+            box-sizing: border-box;
+        }
+        
+        input:focus, select:focus {
+            border-color: #667eea;
+            outline: none;
+            box-shadow: 0 0 10px rgba(102, 126, 234, 0.3);
+            transform: translateY(-2px);
+        }
+        
+        input:hover, select:hover {
+            border-color: #999;
+        }
+        
+        .trade-type-container {
+            display: flex;
+            gap: 10px;
+            margin-top: 8px;
+        }
+        
+        .trade-type-btn {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            font-weight: 600;
+        }
+        
+        .trade-type-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: #667eea;
+            transform: scale(1.02);
+        }
+        
+        .trade-type-btn:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+        }
+        
+        .autocomplete-container {
+            position: relative;
+        }
+        
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: white;
+            min-width: 100%;
+            max-height: 200px;
+            overflow-y: auto;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            z-index: 1000;
+            border: 1px solid #ddd;
+            border-top: none;
+            border-radius: 0 0 8px 8px;
+        }
+        
+        .dropdown-item {
+            color: #333;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            border-bottom: 1px solid #f1f1f1;
+        }
+        
+        .dropdown-item:hover {
+            background-color: #667eea;
+            color: white;
+        }
+        
+        .dropdown-item:last-child {
+            border-bottom: none;
+        }
+        
+        .category-info {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        #calc-result {
+            margin-top: 20px;
+            padding: 25px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            font-weight: 600;
+            text-align: center;
+            border: 2px solid #27ae60;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .result-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 15px;
+        }
+        
+        .result-item {
+            padding: 15px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.7);
+        }
+        
+        .result-label {
+            font-size: 0.9em;
+            color: #7f8c8d;
+            margin-bottom: 5px;
+        }
+        
+        .result-value {
+            font-size: 1.4em;
+            font-weight: 700;
+        }
+        
+        .profit-positive {
+            color: #27ae60;
+        }
+        
+        .profit-negative {
+            color: #e74c3c;
+        }
+        
+        .pips-value {
+            color: #3498db;
+        }
+        
+        .note-box {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            border-left: 4px solid #f39c12;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 25px 0;
+        }
+        
+        .note-title {
+            color: #d35400;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+                margin: 10px;
+            }
+            
+            .input-row {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+            
+            .result-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            
+            h1 {
+                font-size: 1.8em;
+            }
+            
+            .formula-box {
+                font-size: 1em;
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Trading Profit & Pips Calculator</h1>
+        <p class="subtitle">Real-time calculation of profit/loss and pip values for all trading instruments</p>
+        
+        <div class="formula-box">
+            <strong>PROFIT = (Close Price - Open Price) × Direction × Lot Size × Contract Size × Pip Value</strong><br>
+            <strong>PIPS = |Close Price - Open Price| ÷ Pip Size</strong>
+        </div>
+        
+        <div class="interactive-calc">
+            <div class="calc-title">📈 Interactive Profit & Pips Calculator</div>
+            
+            <div class="input-row">
+                <div class="input-group">
+                    <label for="open-price">Open Price:</label>
+                    <input type="number" id="open-price" value="1.1000" step="0.00001" placeholder="Enter opening price">
+                </div>
+                
+                <div class="input-group">
+                    <label for="close-price">Close Price:</label>
+                    <input type="number" id="close-price" value="1.1050" step="0.00001" placeholder="Enter closing price">
+                </div>
+            </div>
+            
+            <div class="input-row">
+                <div class="input-group">
+                    <label>Trade Direction:</label>
+                    <div class="trade-type-container">
+                        <div class="trade-type-btn active" data-type="long">📈 LONG (Buy)</div>
+                        <div class="trade-type-btn" data-type="short">📉 SHORT (Sell)</div>
+                    </div>
+                </div>
+                
+                <div class="input-group">
+                    <label for="lot-size">Lot Size:</label>
+                    <input type="number" id="lot-size" value="1" step="0.01" placeholder="Enter lot size">
+                </div>
+            </div>
+            
+            <div class="input-group full-width">
+                <label for="category-input">Category & Instrument:</label>
+                <div class="autocomplete-container">
+                    <input type="text" id="category-input" placeholder="Type to search instruments (e.g., EURUSD, Gold, Bitcoin...)" autocomplete="off">
+                    <div id="category-dropdown" class="dropdown-content"></div>
+                </div>
+            </div>
+            
+            <div id="calc-result">
+                <div class="result-grid">
+                    <div class="result-item">
+                        <div class="result-label">Total Profit/Loss</div>
+                        <div class="result-value profit-positive" id="profit-value">+$50.00</div>
+                    </div>
+                    <div class="result-item">
+                        <div class="result-label">Pips Gained/Lost</div>
+                        <div class="result-value pips-value" id="pips-value">50.0 pips</div>
+                    </div>
+                    <div class="result-item">
+                        <div class="result-label">Pip Value</div>
+                        <div class="result-value" id="pip-value-display">$1.00</div>
+                    </div>
+                    <div class="result-item">
+                        <div class="result-label">Trade Direction</div>
+                        <div class="result-value" id="direction-display">LONG Position</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="note-box">
+            <div class="note-title">📝 How It Works:</div>
+            <ul>
+                <li><strong>Forex Pairs:</strong> Pip = 0.0001 (0.01 for JPY pairs), Standard lot = 100,000 units</li>
+                <li><strong>Gold (XAUUSD):</strong> Pip = 0.01, Contract size = 100 oz</li>
+                <li><strong>Indices:</strong> Pip = 1 point, Contract size varies by broker</li>
+                <li><strong>Cryptocurrencies:</strong> Pip varies by price level, Contract size = 1 unit</li>
+                <li><strong>Commodities:</strong> Pip sizes vary by instrument type</li>
+                <li><strong>Long Trade:</strong> Profit when close price > open price</li>
+                <li><strong>Short Trade:</strong> Profit when close price < open price</li>
+            </ul>
+        </div>
+    </div>
+    
+    <script>
+        // Enhanced trading instruments database
+        const tradingInstruments = [
+            {
+                name: "Major Forex Pairs",
+                instruments: [
+                    {symbol: "EURUSD", name: "Euro/US Dollar", pipSize: 0.0001, contractSize: 100000, type: "forex"},
+                    {symbol: "GBPUSD", name: "British Pound/US Dollar", pipSize: 0.0001, contractSize: 100000, type: "forex"},
+                    {symbol: "USDJPY", name: "US Dollar/Japanese Yen", pipSize: 0.01, contractSize: 100000, type: "forex"},
+                    {symbol: "USDCHF", name: "US Dollar/Swiss Franc", pipSize: 0.0001, contractSize: 100000, type: "forex"},
+                    {symbol: "AUDUSD", name: "Australian Dollar/US Dollar", pipSize: 0.0001, contractSize: 100000, type: "forex"},
+                    {symbol: "USDCAD", name: "US Dollar/Canadian Dollar", pipSize: 0.0001, contractSize: 100000, type: "forex"},
+                    {symbol: "NZDUSD", name: "New Zealand Dollar/US Dollar", pipSize: 0.0001, contractSize: 100000, type: "forex"}
+                ],
+                description: "Major currency pairs with high liquidity"
+            },
+            {
+                name: "Minor Forex Pairs",
+                instruments: [
+                    {symbol: "EURGBP", name: "Euro/British Pound", pipSize: 0.0001, contractSize: 100000, type: "forex"},
+                    {symbol: "EURJPY", name: "Euro/Japanese Yen", pipSize: 0.01, contractSize: 100000, type: "forex"},
+                    {symbol: "EURCHF", name: "Euro/Swiss Franc", pipSize: 0.0001, contractSize: 100000, type: "forex"},
+                    {symbol: "GBPJPY", name: "British Pound/Japanese Yen", pipSize: 0.01, contractSize: 100000, type: "forex"},
+                    {symbol: "GBPCHF", name: "British Pound/Swiss Franc", pipSize: 0.0001, contractSize: 100000, type: "forex"},
+                    {symbol: "AUDJPY", name: "Australian Dollar/Japanese Yen", pipSize: 0.01, contractSize: 100000, type: "forex"},
+                    {symbol: "CADJPY", name: "Canadian Dollar/Japanese Yen", pipSize: 0.01, contractSize: 100000, type: "forex"}
+                ],
+                description: "Cross currency pairs without USD"
+            },
+            {
+                name: "Precious Metals",
+                instruments: [
+                    {symbol: "XAUUSD", name: "Gold/US Dollar", pipSize: 0.01, contractSize: 100, type: "metal"},
+                    {symbol: "XAGUSD", name: "Silver/US Dollar", pipSize: 0.001, contractSize: 5000, type: "metal"},
+                    {symbol: "XPTUSD", name: "Platinum/US Dollar", pipSize: 0.01, contractSize: 10, type: "metal"},
+                    {symbol: "XPDUSD", name: "Palladium/US Dollar", pipSize: 0.01, contractSize: 10, type: "metal"}
+                ],
+                description: "Precious metals - Safe haven assets"
+            },
+            {
+                name: "Major Cryptocurrencies",
+                instruments: [
+                    {symbol: "BTCUSD", name: "Bitcoin/US Dollar", pipSize: 1, contractSize: 1, type: "crypto"},
+                    {symbol: "ETHUSD", name: "Ethereum/US Dollar", pipSize: 0.01, contractSize: 1, type: "crypto"},
+                    {symbol: "BNBUSD", name: "Binance Coin/US Dollar", pipSize: 0.001, contractSize: 1, type: "crypto"},
+                    {symbol: "ADAUSD", name: "Cardano/US Dollar", pipSize: 0.0001, contractSize: 1, type: "crypto"}
+                ],
+                description: "Top cryptocurrencies by market cap"
+            },
+            {
+                name: "US Stock Indices",
+                instruments: [
+                    {symbol: "SPX500", name: "S&P 500 Index", pipSize: 1, contractSize: 1, type: "index"},
+                    {symbol: "NAS100", name: "Nasdaq 100", pipSize: 1, contractSize: 1, type: "index"},
+                    {symbol: "US30", name: "Dow Jones Industrial Average", pipSize: 1, contractSize: 1, type: "index"},
+                    {symbol: "US2000", name: "Russell 2000", pipSize: 0.1, contractSize: 1, type: "index"}
+                ],
+                description: "Major US stock market indices"
+            },
+            {
+                name: "European Stock Indices",
+                instruments: [
+                    {symbol: "GER40", name: "DAX 40", pipSize: 1, contractSize: 1, type: "index"},
+                    {symbol: "UK100", name: "FTSE 100", pipSize: 1, contractSize: 1, type: "index"},
+                    {symbol: "FRA40", name: "CAC 40", pipSize: 1, contractSize: 1, type: "index"},
+                    {symbol: "SPA35", name: "IBEX 35", pipSize: 1, contractSize: 1, type: "index"}
+                ],
+                description: "Major European stock market indices"
+            },
+            {
+                name: "Energy Commodities",
+                instruments: [
+                    {symbol: "USOIL", name: "WTI Crude Oil", pipSize: 0.01, contractSize: 1000, type: "commodity"},
+                    {symbol: "UKOIL", name: "Brent Crude Oil", pipSize: 0.01, contractSize: 1000, type: "commodity"},
+                    {symbol: "NATGAS", name: "Natural Gas", pipSize: 0.001, contractSize: 10000, type: "commodity"}
+                ],
+                description: "Oil, gas and energy-related commodities"
+            }
+        ];
+
+        let selectedInstrument = tradingInstruments[0].instruments[0]; // Default to EURUSD
+        let tradeDirection = 'long';
+
+        function filterInstruments(input) {
+            const results = [];
+            tradingInstruments.forEach(category => {
+                const matchingInstruments = category.instruments.filter(instrument => 
+                    instrument.symbol.toLowerCase().includes(input.toLowerCase()) ||
+                    instrument.name.toLowerCase().includes(input.toLowerCase())
+                );
+                if (matchingInstruments.length > 0) {
+                    results.push({
+                        category: category.name,
+                        instruments: matchingInstruments,
+                        description: category.description
+                    });
+                }
+            });
+            return results;
+        }
+
+        function showDropdown(results) {
+            const dropdown = document.getElementById('category-dropdown');
+            dropdown.innerHTML = '';
+            
+            if (results.length === 0) {
+                dropdown.style.display = 'none';
+                return;
+            }
+            
+            results.forEach(result => {
+                result.instruments.forEach(instrument => {
+                    const item = document.createElement('div');
+                    item.className = 'dropdown-item';
+                    item.innerHTML = `
+                        <strong>${instrument.symbol}</strong> - ${instrument.name}
+                        <div class="category-info">${result.category}</div>
+                    `;
+                    item.addEventListener('click', () => selectInstrument(instrument, result.category));
+                    dropdown.appendChild(item);
+                });
+            });
+            
+            dropdown.style.display = 'block';
+        }
+
+        function selectInstrument(instrument, categoryName) {
+            selectedInstrument = instrument;
+            const categoryInput = document.getElementById('category-input');
+            categoryInput.value = `${instrument.symbol} - ${instrument.name}`;
+            document.getElementById('category-dropdown').style.display = 'none';
+            calculateProfitAndPips();
+        }
+
+        function calculateProfitAndPips() {
+            const openPrice = parseFloat(document.getElementById('open-price').value) || 0;
+            const closePrice = parseFloat(document.getElementById('close-price').value) || 0;
+            const lotSize = parseFloat(document.getElementById('lot-size').value) || 0;
+            
+            if (!openPrice || !closePrice || !lotSize || !selectedInstrument) {
+                document.getElementById('profit-value').textContent = '$0.00';
+                document.getElementById('pips-value').textContent = '0.0 pips';
+                document.getElementById('pip-value-display').textContent = '$0.00';
+                document.getElementById('direction-display').textContent = tradeDirection.toUpperCase() + ' Position';
+                return;
+            }
+
+            // Calculate pip difference
+            const priceDifference = closePrice - openPrice;
+            const pipDifference = Math.abs(priceDifference) / selectedInstrument.pipSize;
+            
+            // Calculate pip value
+            let pipValue;
+            if (selectedInstrument.type === 'forex') {
+                // For forex, pip value depends on the quote currency
+                if (selectedInstrument.symbol.includes('JPY')) {
+                    pipValue = (selectedInstrument.pipSize * selectedInstrument.contractSize * lotSize) / closePrice;
+                } else if (selectedInstrument.symbol.startsWith('USD')) {
+                    pipValue = selectedInstrument.pipSize * selectedInstrument.contractSize * lotSize;
+                } else {
+                    // For non-USD base currencies, approximate pip value
+                    pipValue = (selectedInstrument.pipSize * selectedInstrument.contractSize * lotSize) / closePrice;
+                }
+            } else {
+                // For non-forex instruments
+                pipValue = selectedInstrument.pipSize * selectedInstrument.contractSize * lotSize;
+            }
+
+            // Calculate total profit/loss
+            let profit;
+            if (tradeDirection === 'long') {
+                profit = priceDifference * selectedInstrument.contractSize * lotSize;
+            } else {
+                profit = -priceDifference * selectedInstrument.contractSize * lotSize;
+            }
+
+            // For forex pairs, adjust profit calculation
+            if (selectedInstrument.type === 'forex') {
+                if (selectedInstrument.symbol.includes('JPY')) {
+                    profit = profit / 100; // JPY adjustment
+                }
+                if (!selectedInstrument.symbol.endsWith('USD')) {
+                    // Approximate conversion for non-USD quote currencies
+                    profit = profit * (closePrice / 1.0); // Simplified conversion
+                }
+            }
+
+            // Update display
+            const profitElement = document.getElementById('profit-value');
+            profitElement.textContent = (profit >= 0 ? '+' : '') + '$' + Math.abs(profit).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            profitElement.className = 'result-value ' + (profit >= 0 ? 'profit-positive' : 'profit-negative');
+
+            document.getElementById('pips-value').textContent = pipDifference.toFixed(1) + ' pips';
+            document.getElementById('pip-value-display').textContent = '$' + Math.abs(pipValue).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            document.getElementById('direction-display').textContent = tradeDirection.toUpperCase() + ' Position';
+        }
+
+        // Event listeners
+        document.getElementById('category-input').addEventListener('input', function(e) {
+            const input = e.target.value;
+            if (input.length === 0) {
+                document.getElementById('category-dropdown').style.display = 'none';
+                return;
+            }
+            
+            const results = filterInstruments(input);
+            showDropdown(results);
+        });
+
+        // Trade direction buttons
+        document.querySelectorAll('.trade-type-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.trade-type-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                tradeDirection = this.dataset.type;
+                calculateProfitAndPips();
+            });
+        });
+
+        // Input event listeners
+        document.getElementById('open-price').addEventListener('input', calculateProfitAndPips);
+        document.getElementById('close-price').addEventListener('input', calculateProfitAndPips);
+        document.getElementById('lot-size').addEventListener('input', calculateProfitAndPips);
+
+        // Hide dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.autocomplete-container')) {
+                document.getElementById('category-dropdown').style.display = 'none';
+            }
+        });
+
+        // Animation effect
+        const inputs = document.querySelectorAll('input');
+        inputs.forEach(input => {
+            input.addEventListener('input', function() {
+                const resultDiv = document.getElementById('calc-result');
+                resultDiv.style.transform = 'scale(1.02)';
+                setTimeout(() => {
+                    resultDiv.style.transform = 'scale(1)';
+                }, 150);
+            });
+        });
+
+        // Initialize with default calculation
+        selectInstrument(tradingInstruments[0].instruments[0], tradingInstruments[0].name);
+        calculateProfitAndPips();
+    </script>
+</body>
+</html>
