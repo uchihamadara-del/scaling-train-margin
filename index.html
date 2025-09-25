@@ -281,8 +281,8 @@
         <p class="subtitle">Real-time calculation of profit/loss and pip values for all trading instruments</p>
         
         <div class="formula-box">
-            <strong>PROFIT = (Close Price - Open Price) × Direction × Lot Size × Contract Size × Pip Value</strong><br>
-            <strong>PIPS = |Close Price - Open Price| ÷ Pip Size</strong>
+            <strong>PROFIT = (Close Price - Open Price) × Direction × Lot Size × Point Value</strong><br>
+            <strong>PIPS/POINTS = |Close Price - Open Price| ÷ Pip Size</strong>
         </div>
         
         <div class="interactive-calc">
@@ -318,7 +318,7 @@
             <div class="input-group full-width">
                 <label for="category-input">Category & Instrument:</label>
                 <div class="autocomplete-container">
-                    <input type="text" id="category-input" placeholder="Type to search instruments (e.g., EURUSD, Gold, Bitcoin...)" autocomplete="off">
+                    <input type="text" id="category-input" placeholder="Type to search instruments (e.g., EURUSD, Gold, Bitcoin, US30...)" autocomplete="off">
                     <div id="category-dropdown" class="dropdown-content"></div>
                 </div>
             </div>
@@ -330,11 +330,11 @@
                         <div class="result-value profit-positive" id="profit-value">+$50.00</div>
                     </div>
                     <div class="result-item">
-                        <div class="result-label">Pips Gained/Lost</div>
+                        <div class="result-label">Pips/Points Gained/Lost</div>
                         <div class="result-value pips-value" id="pips-value">50.0 pips</div>
                     </div>
                     <div class="result-item">
-                        <div class="result-label">Pip Value</div>
+                        <div class="result-label">Point Value</div>
                         <div class="result-value" id="pip-value-display">$1.00</div>
                     </div>
                     <div class="result-item">
@@ -350,9 +350,11 @@
             <ul>
                 <li><strong>Forex Pairs:</strong> Pip = 0.0001 (0.01 for JPY pairs), Standard lot = 100,000 units</li>
                 <li><strong>Gold (XAUUSD):</strong> Pip = 0.01, Contract size = 100 oz</li>
-                <li><strong>Indices:</strong> Pip = 1 point, Contract size varies by broker</li>
-                <li><strong>Cryptocurrencies:</strong> Pip varies by price level, Contract size = 1 unit</li>
-                <li><strong>Commodities:</strong> Pip sizes vary by instrument type</li>
+                <li><strong>Cash Indices:</strong> Point = 1.0, Point values vary by instrument (e.g., US30: $1/point, STOXX50: ~$1.18/point)</li>
+                <li><strong>Asian Indices:</strong> Point = 1.0, Point values optimized for risk management</li>
+                <li><strong>European Indices:</strong> Point = 1.0, Contract size varies by broker</li>
+                <li><strong>Cryptocurrencies:</strong> Point varies by price level, Contract size = 1 unit</li>
+                <li><strong>Commodities:</strong> Point sizes vary by instrument type</li>
                 <li><strong>Long Trade:</strong> Profit when close price > open price</li>
                 <li><strong>Short Trade:</strong> Profit when close price < open price</li>
             </ul>
@@ -360,80 +362,93 @@
     </div>
     
     <script>
-        // Enhanced trading instruments database
+        // Enhanced trading instruments database with new categories
         const tradingInstruments = [
             {
                 name: "Major Forex Pairs",
                 instruments: [
-                    {symbol: "EURUSD", name: "Euro/US Dollar", pipSize: 0.0001, contractSize: 100000, type: "forex"},
-                    {symbol: "GBPUSD", name: "British Pound/US Dollar", pipSize: 0.0001, contractSize: 100000, type: "forex"},
-                    {symbol: "USDJPY", name: "US Dollar/Japanese Yen", pipSize: 0.01, contractSize: 100000, type: "forex"},
-                    {symbol: "USDCHF", name: "US Dollar/Swiss Franc", pipSize: 0.0001, contractSize: 100000, type: "forex"},
-                    {symbol: "AUDUSD", name: "Australian Dollar/US Dollar", pipSize: 0.0001, contractSize: 100000, type: "forex"},
-                    {symbol: "USDCAD", name: "US Dollar/Canadian Dollar", pipSize: 0.0001, contractSize: 100000, type: "forex"},
-                    {symbol: "NZDUSD", name: "New Zealand Dollar/US Dollar", pipSize: 0.0001, contractSize: 100000, type: "forex"}
+                    {symbol: "EURUSD", name: "Euro/US Dollar", pipSize: 0.0001, contractSize: 100000, pointValue: 10, type: "forex"},
+                    {symbol: "GBPUSD", name: "British Pound/US Dollar", pipSize: 0.0001, contractSize: 100000, pointValue: 10, type: "forex"},
+                    {symbol: "USDJPY", name: "US Dollar/Japanese Yen", pipSize: 0.01, contractSize: 100000, pointValue: 10, type: "forex"},
+                    {symbol: "USDCHF", name: "US Dollar/Swiss Franc", pipSize: 0.0001, contractSize: 100000, pointValue: 10, type: "forex"},
+                    {symbol: "AUDUSD", name: "Australian Dollar/US Dollar", pipSize: 0.0001, contractSize: 100000, pointValue: 10, type: "forex"},
+                    {symbol: "USDCAD", name: "US Dollar/Canadian Dollar", pipSize: 0.0001, contractSize: 100000, pointValue: 10, type: "forex"},
+                    {symbol: "NZDUSD", name: "New Zealand Dollar/US Dollar", pipSize: 0.0001, contractSize: 100000, pointValue: 10, type: "forex"}
                 ],
                 description: "Major currency pairs with high liquidity"
             },
             {
                 name: "Minor Forex Pairs",
                 instruments: [
-                    {symbol: "EURGBP", name: "Euro/British Pound", pipSize: 0.0001, contractSize: 100000, type: "forex"},
-                    {symbol: "EURJPY", name: "Euro/Japanese Yen", pipSize: 0.01, contractSize: 100000, type: "forex"},
-                    {symbol: "EURCHF", name: "Euro/Swiss Franc", pipSize: 0.0001, contractSize: 100000, type: "forex"},
-                    {symbol: "GBPJPY", name: "British Pound/Japanese Yen", pipSize: 0.01, contractSize: 100000, type: "forex"},
-                    {symbol: "GBPCHF", name: "British Pound/Swiss Franc", pipSize: 0.0001, contractSize: 100000, type: "forex"},
-                    {symbol: "AUDJPY", name: "Australian Dollar/Japanese Yen", pipSize: 0.01, contractSize: 100000, type: "forex"},
-                    {symbol: "CADJPY", name: "Canadian Dollar/Japanese Yen", pipSize: 0.01, contractSize: 100000, type: "forex"}
+                    {symbol: "EURGBP", name: "Euro/British Pound", pipSize: 0.0001, contractSize: 100000, pointValue: 10, type: "forex"},
+                    {symbol: "EURJPY", name: "Euro/Japanese Yen", pipSize: 0.01, contractSize: 100000, pointValue: 10, type: "forex"},
+                    {symbol: "EURCHF", name: "Euro/Swiss Franc", pipSize: 0.0001, contractSize: 100000, pointValue: 10, type: "forex"},
+                    {symbol: "GBPJPY", name: "British Pound/Japanese Yen", pipSize: 0.01, contractSize: 100000, pointValue: 10, type: "forex"},
+                    {symbol: "GBPCHF", name: "British Pound/Swiss Franc", pipSize: 0.0001, contractSize: 100000, pointValue: 10, type: "forex"},
+                    {symbol: "AUDJPY", name: "Australian Dollar/Japanese Yen", pipSize: 0.01, contractSize: 100000, pointValue: 10, type: "forex"},
+                    {symbol: "CADJPY", name: "Canadian Dollar/Japanese Yen", pipSize: 0.01, contractSize: 100000, pointValue: 10, type: "forex"}
                 ],
                 description: "Cross currency pairs without USD"
             },
             {
+                name: "Cash Indices",
+                instruments: [
+                    {symbol: "AUS200", name: "Australia 200 Cash", pipSize: 1, contractSize: 1, pointValue: 1, type: "cash_index"},
+                    {symbol: "DE40", name: "Germany 40 Cash", pipSize: 1, contractSize: 1, pointValue: 1, type: "cash_index"},
+                    {symbol: "ESP35", name: "Spain 35 Cash", pipSize: 1, contractSize: 1, pointValue: 1, type: "cash_index"},
+                    {symbol: "F40", name: "France 40 Cash", pipSize: 1, contractSize: 1, pointValue: 1, type: "cash_index"},
+                    {symbol: "STOXX50", name: "STOXX Europe 50 Cash", pipSize: 1, contractSize: 1, pointValue: 1.185, type: "cash_index"},
+                    {symbol: "UK100", name: "UK 100 Cash", pipSize: 1, contractSize: 1, pointValue: 0.11, type: "cash_index"},
+                    {symbol: "US30", name: "US 30 Cash", pipSize: 1, contractSize: 1, pointValue: 1, type: "cash_index"},
+                    {symbol: "US500", name: "US 500 Cash", pipSize: 1, contractSize: 1, pointValue: 1, type: "cash_index"},
+                    {symbol: "USTEC", name: "US Tech Cash", pipSize: 1, contractSize: 1, pointValue: 1, type: "cash_index"}
+                ],
+                description: "Cash index CFDs with optimized risk management"
+            },
+            {
+                name: "Asian Indices",
+                instruments: [
+                    {symbol: "HKG33", name: "Hong Kong 33", pipSize: 1, contractSize: 1, pointValue: 0.5, type: "asian_index"},
+                    {symbol: "JP225", name: "Japan 225", pipSize: 1, contractSize: 1, pointValue: 0.0677, type: "asian_index"}
+                ],
+                description: "Asian market indices with conservative point values"
+            },
+            {
                 name: "Precious Metals",
                 instruments: [
-                    {symbol: "XAUUSD", name: "Gold/US Dollar", pipSize: 0.01, contractSize: 100, type: "metal"},
-                    {symbol: "XAGUSD", name: "Silver/US Dollar", pipSize: 0.001, contractSize: 5000, type: "metal"},
-                    {symbol: "XPTUSD", name: "Platinum/US Dollar", pipSize: 0.01, contractSize: 10, type: "metal"},
-                    {symbol: "XPDUSD", name: "Palladium/US Dollar", pipSize: 0.01, contractSize: 10, type: "metal"}
+                    {symbol: "XAUUSD", name: "Gold/US Dollar", pipSize: 0.01, contractSize: 100, pointValue: 1, type: "metal"},
+                    {symbol: "XAGUSD", name: "Silver/US Dollar", pipSize: 0.001, contractSize: 5000, pointValue: 0.05, type: "metal"},
+                    {symbol: "XPTUSD", name: "Platinum/US Dollar", pipSize: 0.01, contractSize: 10, pointValue: 0.1, type: "metal"},
+                    {symbol: "XPDUSD", name: "Palladium/US Dollar", pipSize: 0.01, contractSize: 10, pointValue: 0.1, type: "metal"}
                 ],
                 description: "Precious metals - Safe haven assets"
             },
             {
                 name: "Major Cryptocurrencies",
                 instruments: [
-                    {symbol: "BTCUSD", name: "Bitcoin/US Dollar", pipSize: 1, contractSize: 1, type: "crypto"},
-                    {symbol: "ETHUSD", name: "Ethereum/US Dollar", pipSize: 0.01, contractSize: 1, type: "crypto"},
-                    {symbol: "BNBUSD", name: "Binance Coin/US Dollar", pipSize: 0.001, contractSize: 1, type: "crypto"},
-                    {symbol: "ADAUSD", name: "Cardano/US Dollar", pipSize: 0.0001, contractSize: 1, type: "crypto"}
+                    {symbol: "BTCUSD", name: "Bitcoin/US Dollar", pipSize: 1, contractSize: 1, pointValue: 0.01, type: "crypto"},
+                    {symbol: "ETHUSD", name: "Ethereum/US Dollar", pipSize: 0.01, contractSize: 1, pointValue: 0.01, type: "crypto"},
+                    {symbol: "BNBUSD", name: "Binance Coin/US Dollar", pipSize: 0.001, contractSize: 1, pointValue: 0.001, type: "crypto"},
+                    {symbol: "ADAUSD", name: "Cardano/US Dollar", pipSize: 0.0001, contractSize: 1, pointValue: 0.0001, type: "crypto"}
                 ],
                 description: "Top cryptocurrencies by market cap"
             },
             {
-                name: "US Stock Indices",
-                instruments: [
-                    {symbol: "SPX500", name: "S&P 500 Index", pipSize: 1, contractSize: 1, type: "index"},
-                    {symbol: "NAS100", name: "Nasdaq 100", pipSize: 1, contractSize: 1, type: "index"},
-                    {symbol: "US30", name: "Dow Jones Industrial Average", pipSize: 1, contractSize: 1, type: "index"},
-                    {symbol: "US2000", name: "Russell 2000", pipSize: 0.1, contractSize: 1, type: "index"}
-                ],
-                description: "Major US stock market indices"
-            },
-            {
                 name: "European Stock Indices",
                 instruments: [
-                    {symbol: "GER40", name: "DAX 40", pipSize: 1, contractSize: 1, type: "index"},
-                    {symbol: "UK100", name: "FTSE 100", pipSize: 1, contractSize: 1, type: "index"},
-                    {symbol: "FRA40", name: "CAC 40", pipSize: 1, contractSize: 1, type: "index"},
-                    {symbol: "SPA35", name: "IBEX 35", pipSize: 1, contractSize: 1, type: "index"}
+                    {symbol: "GER40", name: "DAX 40", pipSize: 1, contractSize: 1, pointValue: 1, type: "index"},
+                    {symbol: "UK100", name: "FTSE 100", pipSize: 1, contractSize: 1, pointValue: 1, type: "index"},
+                    {symbol: "FRA40", name: "CAC 40", pipSize: 1, contractSize: 1, pointValue: 1, type: "index"},
+                    {symbol: "SPA35", name: "IBEX 35", pipSize: 1, contractSize: 1, pointValue: 1, type: "index"}
                 ],
                 description: "Major European stock market indices"
             },
             {
                 name: "Energy Commodities",
                 instruments: [
-                    {symbol: "USOIL", name: "WTI Crude Oil", pipSize: 0.01, contractSize: 1000, type: "commodity"},
-                    {symbol: "UKOIL", name: "Brent Crude Oil", pipSize: 0.01, contractSize: 1000, type: "commodity"},
-                    {symbol: "NATGAS", name: "Natural Gas", pipSize: 0.001, contractSize: 10000, type: "commodity"}
+                    {symbol: "USOIL", name: "WTI Crude Oil", pipSize: 0.01, contractSize: 1000, pointValue: 10, type: "commodity"},
+                    {symbol: "UKOIL", name: "Brent Crude Oil", pipSize: 0.01, contractSize: 1000, pointValue: 10, type: "commodity"},
+                    {symbol: "NATGAS", name: "Natural Gas", pipSize: 0.001, contractSize: 10000, pointValue: 10, type: "commodity"}
                 ],
                 description: "Oil, gas and energy-related commodities"
             }
@@ -500,49 +515,48 @@
             
             if (!openPrice || !closePrice || !lotSize || !selectedInstrument) {
                 document.getElementById('profit-value').textContent = '$0.00';
-                document.getElementById('pips-value').textContent = '0.0 pips';
+                document.getElementById('pips-value').textContent = '0.0 points';
                 document.getElementById('pip-value-display').textContent = '$0.00';
                 document.getElementById('direction-display').textContent = tradeDirection.toUpperCase() + ' Position';
                 return;
             }
 
-            // Calculate pip difference
+            // Calculate point/pip difference
             const priceDifference = closePrice - openPrice;
-            const pipDifference = Math.abs(priceDifference) / selectedInstrument.pipSize;
+            const pointDifference = Math.abs(priceDifference) / selectedInstrument.pipSize;
             
-            // Calculate pip value
-            let pipValue;
-            if (selectedInstrument.type === 'forex') {
-                // For forex, pip value depends on the quote currency
-                if (selectedInstrument.symbol.includes('JPY')) {
-                    pipValue = (selectedInstrument.pipSize * selectedInstrument.contractSize * lotSize) / closePrice;
-                } else if (selectedInstrument.symbol.startsWith('USD')) {
-                    pipValue = selectedInstrument.pipSize * selectedInstrument.contractSize * lotSize;
-                } else {
-                    // For non-USD base currencies, approximate pip value
-                    pipValue = (selectedInstrument.pipSize * selectedInstrument.contractSize * lotSize) / closePrice;
-                }
-            } else {
-                // For non-forex instruments
-                pipValue = selectedInstrument.pipSize * selectedInstrument.contractSize * lotSize;
-            }
-
-            // Calculate total profit/loss
+            // Calculate profit/loss based on instrument type
             let profit;
-            if (tradeDirection === 'long') {
-                profit = priceDifference * selectedInstrument.contractSize * lotSize;
+            
+            if (selectedInstrument.type === 'forex') {
+                // Forex calculation
+                if (tradeDirection === 'long') {
+                    profit = priceDifference * selectedInstrument.contractSize * lotSize;
+                } else {
+                    profit = -priceDifference * selectedInstrument.contractSize * lotSize;
+                }
+                
+                // Adjust for JPY pairs
+                if (selectedInstrument.symbol.includes('JPY')) {
+                    profit = profit / 100;
+                }
+                
+                // Adjust for non-USD quote currencies (simplified)
+                if (!selectedInstrument.symbol.endsWith('USD') && selectedInstrument.symbol !== 'USDJPY') {
+                    profit = profit;  // Keep as is for cross pairs
+                }
             } else {
-                profit = -priceDifference * selectedInstrument.contractSize * lotSize;
+                // For indices, metals, crypto, commodities
+                const direction = tradeDirection === 'long' ? 1 : -1;
+                profit = priceDifference * direction * selectedInstrument.pointValue * lotSize;
             }
 
-            // For forex pairs, adjust profit calculation
+            // Calculate point value per lot
+            let pointValuePerLot = selectedInstrument.pointValue;
             if (selectedInstrument.type === 'forex') {
+                pointValuePerLot = selectedInstrument.pointValue; // $10 per pip for standard lot
                 if (selectedInstrument.symbol.includes('JPY')) {
-                    profit = profit / 100; // JPY adjustment
-                }
-                if (!selectedInstrument.symbol.endsWith('USD')) {
-                    // Approximate conversion for non-USD quote currencies
-                    profit = profit * (closePrice / 1.0); // Simplified conversion
+                    pointValuePerLot = selectedInstrument.pointValue; // Already adjusted
                 }
             }
 
@@ -551,8 +565,12 @@
             profitElement.textContent = (profit >= 0 ? '+' : '') + '$' + Math.abs(profit).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
             profitElement.className = 'result-value ' + (profit >= 0 ? 'profit-positive' : 'profit-negative');
 
-            document.getElementById('pips-value').textContent = pipDifference.toFixed(1) + ' pips';
-            document.getElementById('pip-value-display').textContent = '$' + Math.abs(pipValue).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            // Update pips/points label based on instrument type
+            const pointsLabel = selectedInstrument.type === 'forex' ? 'pips' : 'points';
+            document.getElementById('pips-value').textContent = pointDifference.toFixed(1) + ' ' + pointsLabel;
+            
+            const totalPointValue = pointValuePerLot * lotSize;
+            document.getElementById('pip-value-display').textContent = '$' + totalPointValue.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
             document.getElementById('direction-display').textContent = tradeDirection.toUpperCase() + ' Position';
         }
 
